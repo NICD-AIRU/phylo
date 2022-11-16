@@ -80,72 +80,80 @@ dt <- data.frame(
 
 breaks <- sort(unique(weeks))
 
-# Clade labels
-cladelab.phylo.tree <- ggtree(tree_obj, layout = "dendrogram") +
+p <- ggtree(tree_obj, size=1.2) +
+  layout_dendrogram() +
   aes(color=group) +
   scale_color_continuous(
-    name = "Period (Weeks)",
+    name = "Period (wpi)",
     type = "viridis",
-    limits = c(15, 150), breaks = breaks,
-    guide = guide_legend(reverse = TRUE)) +
-  geom_tippoint(show.legend = F) +
+    direction=-1,
+    limits = c(17, 149),
+    breaks = breaks,
+    guide = guide_legend(reverse = FALSE)
+    ) +
+  # geom_tiplab(aes(hjust=.5) +
+  geom_tiplab(
+    aes(
+      label = to.label,
+      angle = if_else(grepl("G3|C5$", to.label), 0, 90)
+    ),
+    colour = "black",
+    size=2.5,
+    offset = -0.02,
+    hjust=1.02,
+    show.legend=FALSE
+    ) +
+  geom_tippoint(
+    show.legend = F,
+    size=2
+  ) +
+  geom_treescale(
+    0.01,
+    width = 0.1,
+    offset = -1.4,
+    # label = "ED",
+    # offset.label = -1.4
+    # show.legend = F
+    )
+  # theme_dendrogram(plot.margin=margin(10,10,120,10)) +
+  # theme(legend.position=c(.04, 0.5))
+
+
+# Clade labels
+cladelab.phylo.tree <- p +
   geom_cladelab(
     data = dt,
     align = T,
     show.legend = F,
-    offset = 0.04,
-    offset.text=0.03,
+    offset = 0.06,
+    offset.text = 0.03,
+    fontface = 2,
     # geom = "image",
     mapping = aes(
       node = node,
       # image = image,
       label = name,
       # color = group
-      )
-    ) +
-  # geom_tiplab(aes(hjust=.5) +
-  geom_tiplab(
-    aes(label = to.label, angle = if_else(grepl("G3|C5$", to.label), 0, 90)),
-    size=2.5, offset = -0.002,
-    hjust=1.02,
-    show.legend=FALSE
-    ) +
-  # theme_dendrogram(plot.margin=margin(10,10,120,10)) +
-  theme(legend.position=c(.05, 0.3))
+    )
+  ) +
+  theme(legend.position=c(.04, 0.5))
 
-ggsave("../plots/cladelabeled_G3_C5_tree.png",
-       cladelab.phylo.tree,
-       width = 16,
-       height = 8
+ggsave(
+  "../plots/cladelabeled_G3_C5_tree.png",
+  cladelab.phylo.tree,
+  width = 10,
+  height = 5
 )
 
 # Regular
-phylo.tree <- ggtree(tree_obj, layout = "dendrogram") +
-  aes(color=group) +
-  scale_color_continuous(
-    name = "Period (Weeks)",
-    type = "viridis",
-    limits = c(15, 150), breaks = breaks,
-    guide = guide_legend(reverse = TRUE)
-  ) +
-  geom_tippoint(show.legend = F) +
-  geom_tiplab(
-    aes(
-      label = to.label,
-      angle = if_else(grepl("G3|C5$", to.label), 0, 90),
-      # hjust = if_else(grepl("G3|C5$", to.label), 1.02, 1.02)
-    ),
-    size=2.5, offset = -0.002,
-    hjust=1.02,
-    show.legend=FALSE
-  ) +
-  theme(legend.position=c(.05, 0.3))
+phylo.tree <- p +
+  theme(legend.position=c(.05, 0.5))
 
 ggsave(
   "../plots/G3_C5_tree.png",
   phylo.tree,
-  width = 16,
-  height = 8
+  width = 10,
+  height = 5
 )
 
 
